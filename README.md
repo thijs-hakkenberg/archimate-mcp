@@ -26,15 +26,14 @@ npm run build
 
 ## Usage with Claude Code
 
-Add the server to Claude Code:
+Clone and build, then add to Claude Code:
 
 ```bash
-claude mcp add archimate -- node /path/to/archimate-mcp-server/dist/index.js
-```
-
-For example:
-```bash
-claude mcp add archimate -- node /Users/thijshakkenberg/archimate_llm_coarchi/archimate-mcp-server/dist/index.js
+git clone https://github.com/thijs-hakkenberg/archimate-mcp.git
+cd archimate-mcp
+npm install
+npm run build
+claude mcp add archimate -- node $(pwd)/dist/index.js
 ```
 
 Verify it was added:
