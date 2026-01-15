@@ -44,6 +44,7 @@ import {
   ArchiMateRelationship,
   ArchiMateDiagram,
   DiagramObject,
+  DiagramConnection,
   ElementType,
   RelationshipType,
   AccessType,
@@ -481,6 +482,33 @@ const tools: Tool[] = [
         height: { type: 'number', description: 'Height (default: 55)' },
       },
       required: ['view_id', 'element_id'],
+    },
+  },
+
+  {
+    name: 'archimate_add_connection_to_view',
+    description: 'Add a relationship connection (line/arrow) between two elements in a view. Both elements must already be in the view.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        view_id: {
+          type: 'string',
+          description: 'ID of the view',
+        },
+        relationship_id: {
+          type: 'string',
+          description: 'ID of the relationship to visualize',
+        },
+        source_diagram_object_id: {
+          type: 'string',
+          description: 'ID of the source diagram object (from archimate_add_to_view response)',
+        },
+        target_diagram_object_id: {
+          type: 'string',
+          description: 'ID of the target diagram object (from archimate_add_to_view response)',
+        },
+      },
+      required: ['view_id', 'relationship_id', 'source_diagram_object_id', 'target_diagram_object_id'],
     },
   },
 
@@ -958,6 +986,71 @@ async function handleToolCall(name: string, args: Record<string, unknown>): Prom
           message: 'Element added to view',
           diagramObject: diagObj,
           elementName: element.name,
+        }, null, 2),
+      }];
+    }
+
+    case 'archimate_add_connection_to_view': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const diagram = currentModel.diagrams.find(d => d.id === args.view_id);
+      if (!diagram) {
+        return [{ type: 'text', text: `Error: View not found: ${args.view_id}` }];
+      }
+
+      const relationshipId = args.relationship_id as string;
+      const relationship = currentModel.relationships.find(r => r.id === relationshipId);
+      if (!relationship) {
+        return [{ type: 'text', text: `Error: Relationship not found: ${relationshipId}` }];
+      }
+
+      const sourceDiagObjId = args.source_diagram_object_id as string;
+      const targetDiagObjId = args.target_diagram_object_id as string;
+
+      const sourceDiagObj = diagram.objects.find(o => o.id === sourceDiagObjId);
+      const targetDiagObj = diagram.objects.find(o => o.id === targetDiagObjId);
+
+      if (!sourceDiagObj) {
+        return [{ type: 'text', text: `Error: Source diagram object not found: ${sourceDiagObjId}` }];
+      }
+      if (!targetDiagObj) {
+        return [{ type: 'text', text: `Error: Target diagram object not found: ${targetDiagObjId}` }];
+      }
+
+      // Create the connection
+      const connectionId = generateId();
+      const connection: DiagramConnection = {
+        id: connectionId,
+        sourceId: sourceDiagObjId,
+        targetId: targetDiagObjId,
+        relationshipId: relationshipId,
+      };
+
+      // Add connection to source object's sourceConnections
+      if (!sourceDiagObj.sourceConnections) {
+        sourceDiagObj.sourceConnections = [];
+      }
+      sourceDiagObj.sourceConnections.push(connection);
+
+      // Add connection ID to target object's targetConnectionIds
+      if (!targetDiagObj.targetConnectionIds) {
+        targetDiagObj.targetConnectionIds = [];
+      }
+      targetDiagObj.targetConnectionIds.push(connectionId);
+
+      return [{
+        type: 'text',
+        text: JSON.stringify({
+          message: 'Connection added to view',
+          connection: {
+            id: connectionId,
+            relationshipId: relationshipId,
+            relationshipType: relationship.type,
+            sourceDiagramObjectId: sourceDiagObjId,
+            targetDiagramObjectId: targetDiagObjId,
+          },
         }, null, 2),
       }];
     }
