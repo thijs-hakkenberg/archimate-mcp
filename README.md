@@ -106,6 +106,7 @@ Add to your Claude Desktop configuration file:
 | `archimate_list_views` | List all diagram views |
 | `archimate_create_view` | Create a new view |
 | `archimate_add_to_view` | Add an element to a view |
+| `archimate_add_connection_to_view` | Add a relationship connection (line/arrow) between elements in a view |
 
 ### Modification
 | Tool | Description |
