@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "MCP server for ArchiMate modeling with coArchi2 repositories",
   "main": "dist/index.js",
+  "bin": {
+    "archimate-mcp-server": "./dist/index.js"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",

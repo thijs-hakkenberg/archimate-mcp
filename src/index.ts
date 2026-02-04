@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * ArchiMate MCP Server
  * Enables LLMs to work with ArchiMate models stored in coArchi2 repositories
