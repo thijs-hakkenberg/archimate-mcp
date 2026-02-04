@@ -26,6 +26,14 @@ npm run build
 
 ## Usage with Claude Code
 
+### Quick Install (npx)
+
+```bash
+claude mcp add archimate -- npx -y archimate-mcp-server
+```
+
+### Build from Source
+
 Clone and build, then add to Claude Code:
 
 ```bash
