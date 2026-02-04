@@ -30,10 +30,10 @@ npm run build
 
 ## Usage with Claude Code
 
-### Quick Install (npx)
+### Quick Install (npx, auto-updates)
 
 ```bash
-claude mcp add archimate -- npx -y archimate-mcp-server
+claude mcp add archimate -- npx -y archimate-mcp-server@latest
 ```
 
 ### Build from Source

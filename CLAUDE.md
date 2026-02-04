@@ -73,6 +73,13 @@ The server exposes three resources:
 - `archimate://spec/relationships` - Relationship type catalog
 - `archimate://model/summary` - Current model summary
 
+## Installation
+
+Recommended install for Claude Code (auto-updates):
+```bash
+claude mcp add archimate -- npx -y archimate-mcp-server@latest
+```
+
 ## Releasing
 
 To publish a new version to npm:
