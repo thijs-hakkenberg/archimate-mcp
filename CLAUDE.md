@@ -73,6 +73,15 @@ The server exposes three resources:
 - `archimate://spec/relationships` - Relationship type catalog
 - `archimate://model/summary` - Current model summary
 
+## Releasing
+
+To publish a new version to npm:
+1. Update version in `package.json`
+2. Update `CHANGELOG.md` with the new version
+3. Commit the version bump
+4. Push a git tag: `git tag v0.x.x && git push origin v0.x.x`
+5. The GitHub Actions pipeline will automatically publish to npm
+
 ## Code Style
 
 - Use TypeScript strict mode
