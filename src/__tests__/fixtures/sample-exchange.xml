@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Model.xsd"
+       identifier="id-sample-model">
+  <name xml:lang="en">Sample Exchange Model</name>
+  <documentation xml:lang="en">A sample model in ArchiMate Open Exchange Format for testing</documentation>
+
+  <elements>
+    <element identifier="id-customer" xsi:type="BusinessActor">
+      <name xml:lang="en">Customer</name>
+      <documentation xml:lang="en">External customer interacting with the system</documentation>
+    </element>
+    <element identifier="id-order-process" xsi:type="BusinessProcess">
+      <name xml:lang="en">Order Process</name>
+      <documentation xml:lang="en">Handles customer orders</documentation>
+    </element>
+    <element identifier="id-order-service" xsi:type="BusinessService">
+      <name xml:lang="en">Order Service</name>
+    </element>
+    <element identifier="id-order-app" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Order Application</name>
+      <documentation xml:lang="en">Main order management application</documentation>
+    </element>
+    <element identifier="id-api-service" xsi:type="ApplicationService">
+      <name xml:lang="en">Order API</name>
+    </element>
+    <element identifier="id-web-server" xsi:type="Node">
+      <name xml:lang="en">Web Server</name>
+      <documentation xml:lang="en">Application server hosting the order app</documentation>
+    </element>
+  </elements>
+
+  <relationships>
+    <relationship identifier="id-rel-1" xsi:type="Assignment" source="id-customer" target="id-order-process">
+      <name xml:lang="en">initiates</name>
+    </relationship>
+    <relationship identifier="id-rel-2" xsi:type="Realization" source="id-order-process" target="id-order-service"/>
+    <relationship identifier="id-rel-3" xsi:type="Serving" source="id-api-service" target="id-order-service"/>
+    <relationship identifier="id-rel-4" xsi:type="Assignment" source="id-web-server" target="id-order-app"/>
+  </relationships>
+
+  <views>
+    <diagrams>
+      <view identifier="id-view-1" viewpoint="Layered">
+        <name xml:lang="en">Main Overview</name>
+        <node identifier="id-node-1" elementRef="id-customer" x="50" y="50" w="120" h="55"/>
+        <node identifier="id-node-2" elementRef="id-order-process" x="200" y="50" w="120" h="55"/>
+        <node identifier="id-node-3" elementRef="id-order-service" x="350" y="50" w="120" h="55"/>
+        <node identifier="id-node-4" elementRef="id-order-app" x="200" y="150" w="120" h="55"/>
+        <node identifier="id-node-5" elementRef="id-api-service" x="350" y="150" w="120" h="55"/>
+        <node identifier="id-node-6" elementRef="id-web-server" x="200" y="250" w="120" h="55"/>
+        <connection identifier="id-conn-1" relationshipRef="id-rel-1" source="id-node-1" target="id-node-2"/>
+        <connection identifier="id-conn-2" relationshipRef="id-rel-3" source="id-node-5" target="id-node-3"/>
+        <connection identifier="id-conn-3" relationshipRef="id-rel-4" source="id-node-6" target="id-node-4"/>
+      </view>
+    </diagrams>
+  </views>
+</model>

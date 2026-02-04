@@ -71,6 +71,19 @@ import {
   getRelationshipGuidance,
 } from './relationships/validation.js';
 
+// Import exporters
+import { generateMermaid, generateMermaidFromView } from './exporters/mermaid-exporter.js';
+import { generateMarkdown, saveMarkdown } from './exporters/markdown-exporter.js';
+import { generateSvg, generatePng, saveDiagram } from './exporters/svg-exporter.js';
+import { generateHtmlDeck, saveHtmlDeck } from './exporters/html-deck-exporter.js';
+
+// Import exchange format handlers
+import { parseExchangeFormat, readExchangeFile } from './exchange/exchange-reader.js';
+import { writeExchangeFormat, saveExchangeFile } from './exchange/exchange-writer.js';
+
+// Import audit logger
+import { getAuditLogger, type AuditLogInput } from './audit/logger.js';
+
 // =============================================================================
 // Server State
 // =============================================================================
@@ -599,6 +612,199 @@ const tools: Tool[] = [
         },
       },
       required: ['element_id'],
+    },
+  },
+
+  // ---------------------------------------------------------------------------
+  // Exchange Format Tools
+  // ---------------------------------------------------------------------------
+  {
+    name: 'archimate_import_exchange',
+    description: 'Import an ArchiMate model from Open Exchange Format XML file',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Path to the .xml exchange file',
+        },
+      },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'archimate_export_exchange',
+    description: 'Export the current model to ArchiMate Open Exchange Format XML',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'Path to save the exchange XML file',
+        },
+      },
+      required: ['path'],
+    },
+  },
+
+  // ---------------------------------------------------------------------------
+  // Export Tools
+  // ---------------------------------------------------------------------------
+  {
+    name: 'archimate_export_mermaid',
+    description: 'Generate Mermaid diagram syntax from the model or a specific view',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        view_id: {
+          type: 'string',
+          description: 'Optional: ID of a specific view to export (exports full model if not specified)',
+        },
+        direction: {
+          type: 'string',
+          enum: ['TB', 'LR', 'BT', 'RL'],
+          description: 'Diagram direction (default: TB for top-to-bottom)',
+        },
+        include_labels: {
+          type: 'boolean',
+          description: 'Include relationship labels in diagram (default: false)',
+        },
+        layer_filter: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter to specific layers (e.g., ["Business", "Application"])',
+        },
+      },
+    },
+  },
+  {
+    name: 'archimate_export_diagram',
+    description: 'Export a diagram view as SVG or PNG image',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        view_id: {
+          type: 'string',
+          description: 'ID of the view to export',
+        },
+        output_path: {
+          type: 'string',
+          description: 'Path to save the image file (use .svg or .png extension)',
+        },
+        format: {
+          type: 'string',
+          enum: ['svg', 'png'],
+          description: 'Output format (default: detected from file extension)',
+        },
+        width: {
+          type: 'number',
+          description: 'Image width in pixels (optional)',
+        },
+        height: {
+          type: 'number',
+          description: 'Image height in pixels (optional)',
+        },
+        background_color: {
+          type: 'string',
+          description: 'Background color (default: #ffffff)',
+        },
+      },
+      required: ['view_id', 'output_path'],
+    },
+  },
+  {
+    name: 'archimate_export_markdown',
+    description: 'Export the model as Markdown documentation',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        output_path: {
+          type: 'string',
+          description: 'Path to save the Markdown file',
+        },
+        include_views: {
+          type: 'boolean',
+          description: 'Include views section (default: true)',
+        },
+        include_diagrams: {
+          type: 'boolean',
+          description: 'Embed Mermaid diagrams in output (default: true)',
+        },
+        include_relationships: {
+          type: 'boolean',
+          description: 'Include relationship details for each element (default: true)',
+        },
+        include_properties: {
+          type: 'boolean',
+          description: 'Include element properties (default: false)',
+        },
+      },
+      required: ['output_path'],
+    },
+  },
+  {
+    name: 'archimate_export_html_deck',
+    description: 'Export the model as an interactive HTML deck with tabs and search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        output_path: {
+          type: 'string',
+          description: 'Path to save the HTML file',
+        },
+        title: {
+          type: 'string',
+          description: 'Title for the HTML deck (default: model name)',
+        },
+        theme: {
+          type: 'string',
+          enum: ['light', 'dark'],
+          description: 'Color theme (default: light)',
+        },
+        include_search: {
+          type: 'boolean',
+          description: 'Include search functionality (default: true)',
+        },
+        embed_diagrams: {
+          type: 'boolean',
+          description: 'Embed SVG diagrams instead of Mermaid (default: true)',
+        },
+      },
+      required: ['output_path'],
+    },
+  },
+
+  // ---------------------------------------------------------------------------
+  // Audit Tools
+  // ---------------------------------------------------------------------------
+  {
+    name: 'archimate_configure_audit',
+    description: 'Configure audit logging for model operations',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        enabled: {
+          type: 'boolean',
+          description: 'Enable or disable audit logging',
+        },
+        log_path: {
+          type: 'string',
+          description: 'Path to the audit log file',
+        },
+      },
+    },
+  },
+  {
+    name: 'archimate_get_audit_log',
+    description: 'Read recent entries from the audit log',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Maximum number of entries to return (default: 50)',
+        },
+      },
     },
   },
 ];
@@ -1217,6 +1423,318 @@ async function handleToolCall(name: string, args: Record<string, unknown>): Prom
           maxDepth,
           impactedElements: impact,
           totalImpacted: impact.length,
+        }, null, 2),
+      }];
+    }
+
+    // -------------------------------------------------------------------------
+    // Exchange Format
+    // -------------------------------------------------------------------------
+    case 'archimate_import_exchange': {
+      const path = args.path as string;
+      const startTime = Date.now();
+
+      try {
+        currentModel = await readExchangeFile(path);
+        currentModelPath = null; // Exchange format, not coArchi
+
+        const elements = getAllElements(currentModel);
+        const layerCounts: Record<string, number> = {};
+        for (const elem of elements) {
+          const layer = getLayerForElementType(elem.type);
+          layerCounts[layer] = (layerCounts[layer] || 0) + 1;
+        }
+
+        getAuditLogger().log({
+          event: 'archimate_import_exchange',
+          action: 'import',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { path, elementCount: elements.length },
+        });
+
+        return [{
+          type: 'text',
+          text: JSON.stringify({
+            message: 'Model imported from exchange format',
+            name: currentModel.name,
+            id: currentModel.id,
+            totalElements: elements.length,
+            relationships: currentModel.relationships.length,
+            diagrams: currentModel.diagrams.length,
+            elementsByLayer: layerCounts,
+          }, null, 2),
+        }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_import_exchange',
+          action: 'import',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    case 'archimate_export_exchange': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const path = args.path as string;
+      const startTime = Date.now();
+
+      try {
+        await saveExchangeFile(currentModel, path);
+
+        getAuditLogger().log({
+          event: 'archimate_export_exchange',
+          action: 'export',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { path },
+        });
+
+        return [{
+          type: 'text',
+          text: JSON.stringify({
+            message: 'Model exported to exchange format',
+            path,
+          }, null, 2),
+        }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_export_exchange',
+          action: 'export',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Exporters
+    // -------------------------------------------------------------------------
+    case 'archimate_export_mermaid': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const startTime = Date.now();
+      const viewId = args.view_id as string | undefined;
+      const direction = (args.direction as 'TB' | 'LR' | 'BT' | 'RL') || 'TB';
+      const includeLabels = (args.include_labels as boolean) ?? false;
+      const layerFilter = args.layer_filter as string[] | undefined;
+
+      try {
+        let mermaid: string;
+        if (viewId) {
+          mermaid = generateMermaidFromView(currentModel, viewId, {
+            direction,
+            includeRelationshipLabels: includeLabels,
+          });
+        } else {
+          mermaid = generateMermaid(currentModel, {
+            direction,
+            includeRelationshipLabels: includeLabels,
+            layerFilter,
+          });
+        }
+
+        getAuditLogger().log({
+          event: 'archimate_export_mermaid',
+          action: 'export',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { viewId, direction },
+        });
+
+        return [{ type: 'text', text: mermaid }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_export_mermaid',
+          action: 'export',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    case 'archimate_export_diagram': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const viewId = args.view_id as string;
+      const outputPath = args.output_path as string;
+      const format = (args.format as 'svg' | 'png') || (outputPath.endsWith('.png') ? 'png' : 'svg');
+      const startTime = Date.now();
+
+      try {
+        await saveDiagram(currentModel, viewId, outputPath, {
+          format,
+          width: args.width as number | undefined,
+          height: args.height as number | undefined,
+          backgroundColor: args.background_color as string | undefined,
+          colorByLayer: true,
+          showLabels: true,
+        });
+
+        getAuditLogger().log({
+          event: 'archimate_export_diagram',
+          action: 'export',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { viewId, outputPath, format },
+        });
+
+        return [{
+          type: 'text',
+          text: JSON.stringify({
+            message: 'Diagram exported successfully',
+            viewId,
+            outputPath,
+            format,
+          }, null, 2),
+        }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_export_diagram',
+          action: 'export',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    case 'archimate_export_markdown': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const outputPath = args.output_path as string;
+      const startTime = Date.now();
+
+      try {
+        await saveMarkdown(currentModel, outputPath, {
+          includeViews: (args.include_views as boolean) ?? true,
+          includeDiagrams: (args.include_diagrams as boolean) ?? true,
+          includeRelationships: (args.include_relationships as boolean) ?? true,
+          includeProperties: (args.include_properties as boolean) ?? false,
+          groupByLayer: true,
+        });
+
+        getAuditLogger().log({
+          event: 'archimate_export_markdown',
+          action: 'export',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { outputPath },
+        });
+
+        return [{
+          type: 'text',
+          text: JSON.stringify({
+            message: 'Markdown documentation exported successfully',
+            outputPath,
+          }, null, 2),
+        }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_export_markdown',
+          action: 'export',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    case 'archimate_export_html_deck': {
+      if (!currentModel) {
+        return [{ type: 'text', text: 'Error: No model is currently open' }];
+      }
+
+      const outputPath = args.output_path as string;
+      const startTime = Date.now();
+
+      try {
+        await saveHtmlDeck(currentModel, outputPath, {
+          title: args.title as string | undefined,
+          theme: (args.theme as 'light' | 'dark') || 'light',
+          includeSearch: (args.include_search as boolean) ?? true,
+          embedDiagrams: (args.embed_diagrams as boolean) ?? true,
+        });
+
+        getAuditLogger().log({
+          event: 'archimate_export_html_deck',
+          action: 'export',
+          success: true,
+          durationMs: Date.now() - startTime,
+          details: { outputPath },
+        });
+
+        return [{
+          type: 'text',
+          text: JSON.stringify({
+            message: 'HTML deck exported successfully',
+            outputPath,
+          }, null, 2),
+        }];
+      } catch (error) {
+        getAuditLogger().log({
+          event: 'archimate_export_html_deck',
+          action: 'export',
+          success: false,
+          durationMs: Date.now() - startTime,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Audit
+    // -------------------------------------------------------------------------
+    case 'archimate_configure_audit': {
+      const logger = getAuditLogger();
+
+      if (args.enabled !== undefined) {
+        logger.setEnabled(args.enabled as boolean);
+      }
+
+      if (args.log_path) {
+        logger.setLogPath(args.log_path as string);
+      }
+
+      return [{
+        type: 'text',
+        text: JSON.stringify({
+          enabled: logger.isEnabled(),
+          logPath: logger.getLogPath(),
+        }, null, 2),
+      }];
+    }
+
+    case 'archimate_get_audit_log': {
+      const logger = getAuditLogger();
+      const limit = (args.limit as number) || 50;
+      const entries = logger.getEntries(limit);
+
+      return [{
+        type: 'text',
+        text: JSON.stringify({
+          total: entries.length,
+          limit,
+          entries,
         }, null, 2),
       }];
     }

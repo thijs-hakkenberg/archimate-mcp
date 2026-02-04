@@ -8,6 +8,10 @@ An MCP (Model Context Protocol) server that enables LLMs to work with ArchiMate 
 - **Relationship Validation**: Enforces valid ArchiMate relationships per the specification
 - **LLM-Friendly Design**: Layer-specific tools with enumerated element types guide correct usage
 - **coArchi2 Compatible**: Reads and writes `model.archimate` XML files
+- **ArchiMate Exchange Format**: Import/export using the standard ArchiMate Open Exchange Format
+- **Multiple Export Formats**: SVG, PNG, Mermaid diagrams, Markdown documentation, and interactive HTML decks
+- **Audit Logging**: Track all model operations with NDJSON audit logs
+- **Impact Analysis**: Analyze dependencies and impacts of architecture changes
 
 ## Installation
 
@@ -72,7 +76,7 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-## Available Tools
+## Available Tools (32 total)
 
 ### Model Management
 | Tool | Description |
@@ -129,6 +133,26 @@ Add to your Claude Desktop configuration file:
 | `archimate_layer_summary` | Get element counts by layer |
 | `archimate_impact_analysis` | Analyze element dependencies |
 
+### Exchange Format (Import/Export)
+| Tool | Description |
+|------|-------------|
+| `archimate_import_exchange` | Import model from ArchiMate Open Exchange XML |
+| `archimate_export_exchange` | Export model to ArchiMate Open Exchange XML |
+
+### Export Tools
+| Tool | Description |
+|------|-------------|
+| `archimate_export_mermaid` | Generate Mermaid diagram syntax from model or view |
+| `archimate_export_diagram` | Export view as SVG or PNG image |
+| `archimate_export_markdown` | Export model as Markdown documentation |
+| `archimate_export_html_deck` | Export model as interactive HTML deck |
+
+### Audit Logging
+| Tool | Description |
+|------|-------------|
+| `archimate_configure_audit` | Enable/disable audit logging, set log path |
+| `archimate_get_audit_log` | Read recent audit log entries |
+
 ## Available Resources
 
 | URI | Description |
@@ -155,6 +179,65 @@ Show me all elements in the Application layer
 What relationships are valid between ApplicationComponent and BusinessProcess?
 
 Do an impact analysis on the "Order Service" component
+
+Export the model as Markdown documentation to /path/to/docs.md
+
+Generate a Mermaid diagram for the Business layer
+
+Export the main view as an SVG to /path/to/diagram.svg
+
+Create an interactive HTML deck of the architecture
+```
+
+## Export Formats
+
+### Mermaid Diagrams
+Generate Mermaid flowchart syntax that can be rendered in Mermaid-compatible viewers:
+```mermaid
+flowchart TB
+    subgraph Business["Business Layer"]
+        BA1["Customer"]
+        BP1["Order Process"]
+    end
+    subgraph Application["Application Layer"]
+        AC1["Order Service"]
+    end
+    AC1 -->|Serving| BP1
+```
+
+### SVG/PNG Diagrams
+Export diagram views as scalable SVG or rasterized PNG images with:
+- Color-coded elements by layer
+- ArchiMate notation
+- Relationship lines with appropriate arrows
+
+### Markdown Documentation
+Generate comprehensive documentation including:
+- Model overview with statistics
+- Elements grouped by layer
+- Relationship details
+- Embedded Mermaid diagrams for views
+
+### HTML Deck
+Create an interactive single-file HTML presentation with:
+- Tab navigation by layer
+- Element cards with relationship details
+- Search functionality
+- Light/dark theme support
+- Embedded SVG diagrams
+
+## Audit Logging
+
+All model operations can be logged to an NDJSON file for auditing:
+
+```json
+{"timestamp":"2024-01-15T10:30:00.000Z","event":"archimate_create_business_element","action":"create","elementType":"BusinessActor","elementId":"id-123","elementName":"Customer","success":true,"durationMs":5}
+```
+
+Configure via environment variable:
+```bash
+export ARCHIMATE_AUDIT_LOG=/path/to/audit.ndjson  # Set log path
+export ARCHIMATE_AUDIT_LOG=disabled               # Disable logging
 ```
 
 ## Relationship Validation
@@ -176,11 +259,30 @@ archimate-mcp-server/
 │   │   ├── types.ts          # ArchiMate type definitions
 │   │   ├── parser.ts         # XML model parser
 │   │   └── writer.ts         # XML model writer
-│   └── relationships/
-│       └── validation.ts     # Relationship validation
+│   ├── relationships/
+│   │   └── validation.ts     # Relationship validation
+│   ├── exporters/
+│   │   ├── mermaid-exporter.ts    # Mermaid diagram generation
+│   │   ├── svg-exporter.ts        # SVG/PNG diagram rendering
+│   │   ├── markdown-exporter.ts   # Markdown documentation
+│   │   └── html-deck-exporter.ts  # HTML presentation deck
+│   ├── exchange/
+│   │   ├── exchange-reader.ts     # ArchiMate Exchange import
+│   │   └── exchange-writer.ts     # ArchiMate Exchange export
+│   └── audit/
+│       └── logger.ts              # Audit logging system
 ├── dist/                     # Compiled output
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── vitest.config.ts          # Test configuration
+```
+
+## Testing
+
+```bash
+npm test              # Run tests
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage
 ```
 
 ## License
