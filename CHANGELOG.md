@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- `archimate_add_to_view` now auto-draws diagram connections for any relationship between the new element and an element already on the canvas, mirroring Archi's native drag-in behavior. Orientation matches the relationship direction and existing connections are not duplicated. The response includes an `autoConnectedRelationships` array listing every connection drawn.
+- Added an `auto_connect` boolean parameter to `archimate_add_to_view` (default `true`) to opt out of auto-drawing.
+- Updated the description of `archimate_add_connection_to_view` to clarify that it is normally unnecessary and should only be used for manual overrides.
+
 ## [0.2.0] - 2026-02-04
 
 ### Added
