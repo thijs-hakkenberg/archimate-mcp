@@ -97,6 +97,7 @@ function buildRelationship(rel: ArchiMateRelationship): Record<string, unknown> 
 function buildDiagramNode(obj: DiagramObject): Record<string, unknown> {
   return {
     '@_identifier': obj.id,
+    '@_xsi:type': 'archimate:ViewNode',
     '@_elementRef': obj.elementId,
     '@_x': obj.bounds.x,
     '@_y': obj.bounds.y,
@@ -111,6 +112,7 @@ function buildDiagramNode(obj: DiagramObject): Record<string, unknown> {
 function buildConnection(conn: DiagramConnection): Record<string, unknown> {
   return {
     '@_identifier': conn.id,
+    '@_xsi:type': 'archimate:ViewConnection',
     '@_relationshipRef': conn.relationshipId,
     '@_source': conn.sourceId,
     '@_target': conn.targetId,
@@ -123,6 +125,7 @@ function buildConnection(conn: DiagramConnection): Record<string, unknown> {
 function buildView(diagram: ArchiMateDiagram): Record<string, unknown> {
   const view: Record<string, unknown> = {
     '@_identifier': diagram.id,
+    '@_xsi:type': 'archimate:ArchimateDiagramModel',
     name: {
       '@_xml:lang': 'en',
       '#text': diagram.name,
@@ -183,6 +186,7 @@ export function writeExchangeFormat(model: ArchiMateModel): string {
   const modelObj: Record<string, unknown> = {
     '@_xmlns': 'http://www.opengroup.org/xsd/archimate/3.0/',
     '@_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+    '@_xmlns:archimate': 'http://www.opengroup.org/xsd/archimate/3.0/',
     '@_xsi:schemaLocation': 'http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Model.xsd',
     '@_identifier': model.id,
     name: {

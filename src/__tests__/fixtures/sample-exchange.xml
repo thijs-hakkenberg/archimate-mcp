@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:archimate="http://www.opengroup.org/xsd/archimate/3.0/"
        xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Model.xsd"
        identifier="id-sample-model">
   <name xml:lang="en">Sample Exchange Model</name>
@@ -42,17 +43,17 @@
 
   <views>
     <diagrams>
-      <view identifier="id-view-1" viewpoint="Layered">
+      <view identifier="id-view-1" xsi:type="archimate:ArchimateDiagramModel" viewpoint="Layered">
         <name xml:lang="en">Main Overview</name>
-        <node identifier="id-node-1" elementRef="id-customer" x="50" y="50" w="120" h="55"/>
-        <node identifier="id-node-2" elementRef="id-order-process" x="200" y="50" w="120" h="55"/>
-        <node identifier="id-node-3" elementRef="id-order-service" x="350" y="50" w="120" h="55"/>
-        <node identifier="id-node-4" elementRef="id-order-app" x="200" y="150" w="120" h="55"/>
-        <node identifier="id-node-5" elementRef="id-api-service" x="350" y="150" w="120" h="55"/>
-        <node identifier="id-node-6" elementRef="id-web-server" x="200" y="250" w="120" h="55"/>
-        <connection identifier="id-conn-1" relationshipRef="id-rel-1" source="id-node-1" target="id-node-2"/>
-        <connection identifier="id-conn-2" relationshipRef="id-rel-3" source="id-node-5" target="id-node-3"/>
-        <connection identifier="id-conn-3" relationshipRef="id-rel-4" source="id-node-6" target="id-node-4"/>
+        <node identifier="id-node-1" xsi:type="archimate:ViewNode" elementRef="id-customer" x="50" y="50" w="120" h="55"/>
+        <node identifier="id-node-2" xsi:type="archimate:ViewNode" elementRef="id-order-process" x="200" y="50" w="120" h="55"/>
+        <node identifier="id-node-3" xsi:type="archimate:ViewNode" elementRef="id-order-service" x="350" y="50" w="120" h="55"/>
+        <node identifier="id-node-4" xsi:type="archimate:ViewNode" elementRef="id-order-app" x="200" y="150" w="120" h="55"/>
+        <node identifier="id-node-5" xsi:type="archimate:ViewNode" elementRef="id-api-service" x="350" y="150" w="120" h="55"/>
+        <node identifier="id-node-6" xsi:type="archimate:ViewNode" elementRef="id-web-server" x="200" y="250" w="120" h="55"/>
+        <connection identifier="id-conn-1" xsi:type="archimate:ViewConnection" relationshipRef="id-rel-1" source="id-node-1" target="id-node-2"/>
+        <connection identifier="id-conn-2" xsi:type="archimate:ViewConnection" relationshipRef="id-rel-3" source="id-node-5" target="id-node-3"/>
+        <connection identifier="id-conn-3" xsi:type="archimate:ViewConnection" relationshipRef="id-rel-4" source="id-node-6" target="id-node-4"/>
       </view>
     </diagrams>
   </views>
