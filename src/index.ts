@@ -27,6 +27,8 @@ import {
   getFolderByType,
 } from './model/parser.js';
 
+import { autoConnectDiagramObject } from './model/view-helpers.js';
+
 import {
   writeModel,
   createEmptyModel,
@@ -478,7 +480,7 @@ const tools: Tool[] = [
   },
   {
     name: 'archimate_add_to_view',
-    description: 'Add an element to a diagram view',
+    description: 'Add an element to a diagram view. Connections for relationships between this element and any element already in the view are drawn automatically - you do not need to call archimate_add_connection_to_view for them. The response lists every connection that was auto-drawn in autoConnectedRelationships.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -494,6 +496,10 @@ const tools: Tool[] = [
         y: { type: 'number', description: 'Y position (default: auto)' },
         width: { type: 'number', description: 'Width (default: 120)' },
         height: { type: 'number', description: 'Height (default: 55)' },
+        auto_connect: {
+          type: 'boolean',
+          description: 'Auto-draw diagram connections for relationships between this element and on-canvas peers (default: true). Set to false only if you want to place the element without any connections and add them manually.',
+        },
       },
       required: ['view_id', 'element_id'],
     },
@@ -501,7 +507,7 @@ const tools: Tool[] = [
 
   {
     name: 'archimate_add_connection_to_view',
-    description: 'Add a relationship connection (line/arrow) between two elements in a view. Both elements must already be in the view.',
+    description: 'Manually add a connection (line/arrow) between two diagram objects in a view. Normally unnecessary - archimate_add_to_view auto-draws connections for all relationships it finds between the new element and existing on-canvas elements. Use this tool only to: (a) restore a connection after calling archimate_add_to_view with auto_connect: false, or (b) add a connection that was not auto-drawn because one endpoint was not yet in the view. Both diagram objects must already be in the view.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -1187,12 +1193,27 @@ async function handleToolCall(name: string, args: Record<string, unknown>): Prom
 
       diagram.objects.push(diagObj);
 
+      const autoConnect = args.auto_connect !== false;
+      const autoConnected = autoConnect
+        ? autoConnectDiagramObject(currentModel, diagram, diagObj).map((conn) => {
+            const rel = currentModel!.relationships.find((r) => r.id === conn.relationshipId);
+            return {
+              connectionId: conn.id,
+              relationshipId: conn.relationshipId,
+              relationshipType: rel?.type,
+              sourceDiagramObjectId: conn.sourceId,
+              targetDiagramObjectId: conn.targetId,
+            };
+          })
+        : [];
+
       return [{
         type: 'text',
         text: JSON.stringify({
           message: 'Element added to view',
           diagramObject: diagObj,
           elementName: element.name,
+          autoConnectedRelationships: autoConnected,
         }, null, 2),
       }];
     }
