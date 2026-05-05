@@ -5,6 +5,12 @@ on:
     tags:
       - 'v*'
 
+env:
+  # Run JavaScript-based actions (checkout, setup-node, etc.) on Node 24 instead
+  # of the deprecated Node 20 runner. Becomes the default on 2026-06-02 and is
+  # required from 2026-09-16 when Node 20 is removed from runners.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   publish:
     runs-on: ubuntu-latest
