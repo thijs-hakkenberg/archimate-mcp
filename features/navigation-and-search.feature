@@ -44,8 +44,12 @@ Feature: Navigation and search
     When the caller invokes archimate_find_elements with pattern "Service" and layer "Application"
     Then only the ApplicationComponent is returned
 
-  Scenario: Layer summary returns counts grouped by layer
-    Given a model with 3 Business, 5 Application, and 2 Technology elements
+  Scenario: Layer summary returns counts grouped by layer and element type
+    Given a model with 1 BusinessActor, 2 BusinessProcess, 5 ApplicationComponent, and 2 Node elements
     When the caller invokes archimate_layer_summary
-    Then the response reports 3 for Business, 5 for Application, 2 for Technology
-    And empty layers report a count of zero rather than being omitted
+    Then the response includes totals for elements, relationships, and views
+    And the byLayer map reports per-element-type counts within each populated layer
+    And byLayer["Business"] contains BusinessActor: 1 and BusinessProcess: 2
+    And byLayer["Application"] contains ApplicationComponent: 5
+    And byLayer["Technology"] contains Node: 2
+    And layers with no elements (e.g. Motivation, Strategy) are omitted from byLayer

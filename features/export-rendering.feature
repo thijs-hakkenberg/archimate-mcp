@@ -24,11 +24,11 @@ Feature: Export and rendering
     And every element on the canvas appears as a rectangle colored by ArchiMate layer
     And every diagram connection appears as a line with the appropriate arrow head
 
-  Scenario: Export a view as PNG when Sharp is available
-    Given the optional sharp dependency is installed
-    And a view "V"
+  Scenario: Export a view as PNG
+    Given a view "V"
     When the caller invokes archimate_export_diagram with format "png" and an output path
     Then a rasterized PNG file is written to that path
+    And the format is auto-detected from a ".png" output path when format is omitted
 
   Scenario: Export the model as Markdown documentation
     When the caller invokes archimate_export_markdown with an output path

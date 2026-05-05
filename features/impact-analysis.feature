@@ -25,7 +25,12 @@ Feature: Impact analysis
     And includes the BusinessActor at depth 2
     And does not extend further
 
-  Scenario: Default depth is bounded
+  Scenario: Default depth is 2
     When the caller invokes archimate_impact_analysis with no depth specified
-    Then traversal stops at the documented default depth
-    And the response indicates the depth used
+    Then traversal walks at most two hops in the requested direction
+    And the response's maxDepth field reports 2
+
+  Scenario: Default direction is "both"
+    When the caller invokes archimate_impact_analysis with no direction specified
+    Then the response's direction field reports "both"
+    And both incoming and outgoing edges are traversed
