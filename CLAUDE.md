@@ -13,7 +13,7 @@ An MCP server for working with ArchiMate models in coArchi2 repositories.
 
 ```
 src/
-├── index.ts                    # MCP server entry point with 32 tool definitions
+├── index.ts                    # MCP server entry point with 33 tool definitions
 ├── model/
 │   ├── types.ts               # ArchiMate type definitions (59 element types)
 │   ├── parser.ts              # coArchi2 XML parser
@@ -82,12 +82,19 @@ claude mcp add archimate -- npx -y archimate-mcp-server@latest
 
 ## Releasing
 
-To publish a new version to npm:
-1. Update version in `package.json`
-2. Update `CHANGELOG.md` with the new version
-3. Commit the version bump
-4. Push a git tag matching `v*`: `git tag v0.x.x && git push origin v0.x.x`
-5. The GitHub Actions pipeline (`.github/workflows/publish.yml`) will automatically publish to npm
+Publishes are automated via `.github/workflows/publish.yml` (triggered by any `v*` tag). Auth uses **npm OIDC trusted publishing** — no `NPM_TOKEN` secret is involved; the workflow exchanges its GitHub OIDC token for short-lived publish credentials. Provenance is signed automatically.
+
+Procedure (commit directly to `main` — no PR needed for a release bump):
+
+1. Pick the next version per [semver](https://semver.org/): `MAJOR.MINOR.PATCH`. Backwards-compatible feature → bump MINOR; bug fix → bump PATCH; breaking change → bump MAJOR.
+2. Update `package.json` `version` and run `npm install --package-lock-only` to sync `package-lock.json`.
+3. In `CHANGELOG.md`, rename the `[Unreleased]` heading to `[X.Y.Z] - YYYY-MM-DD`, group entries under `### Added` / `### Changed` / `### Fixed` / `### Removed`, and add a fresh empty `[Unreleased]` heading above. Add the new compare link at the bottom (`[X.Y.Z]: .../compare/vPREV...vX.Y.Z`) and update the `[Unreleased]` link to compare against the new tag.
+4. Commit: `chore: release X.Y.Z` (one-line summary of what's in it is fine in the body).
+5. `git push origin main`.
+6. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+7. The workflow runs `npm ci`, `npm run build`, `npm test`, then `npm publish --provenance --access public`. Watch with `gh run watch`. If it fails before publish (build/tests), fix forward, force-update the tag (`git tag -f vX.Y.Z <sha> && git push -f origin vX.Y.Z`) only if nothing was published yet — npm versions are immutable once accepted.
+
+Verify after success: `npm view archimate-mcp-server version` should return `X.Y.Z`. Existing `npx -y archimate-mcp-server@latest` users auto-pick it up.
 
 ## Code Style
 

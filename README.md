@@ -76,7 +76,7 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-## Available Tools (32 total)
+## Available Tools (33 total)
 
 ### Model Management
 | Tool | Description |
@@ -117,8 +117,8 @@ Add to your Claude Desktop configuration file:
 |------|-------------|
 | `archimate_list_views` | List all diagram views |
 | `archimate_create_view` | Create a new view |
-| `archimate_add_to_view` | Add an element to a view |
-| `archimate_add_connection_to_view` | Add a relationship connection (line/arrow) between elements in a view |
+| `archimate_add_to_view` | Add an element to a view; connections to on-canvas peers are auto-drawn (opt out with `auto_connect: false`) |
+| `archimate_add_connection_to_view` | Manually add a connection — normally unnecessary since `archimate_add_to_view` auto-draws |
 
 ### Modification
 | Tool | Description |
