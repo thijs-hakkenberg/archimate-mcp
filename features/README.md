@@ -10,23 +10,27 @@ This directory holds Gherkin `.feature` files documenting every observable behav
 
 ## Scope
 
-The files in this directory are **documentation-only**. There is no cucumber runner; the executable test of record remains vitest under `src/`. Adding cucumber-js later is a deliberate decision, not a default.
+These files are **executable specs**. Each `.feature` is paired with a sibling `<area>.feature.test.ts` that binds its scenarios to step implementations via [`@amiceli/vitest-cucumber`](https://vitest-cucumber.miceli.click/). They run as part of `npm test` and the runner fails if any scenario lacks a binding — keeping spec and test in lockstep.
+
+The vitest unit tests under `src/` remain in place; both layers run together.
 
 ## File organization
 
 One `.feature` per cohesive feature area, not per tool. The current areas:
 
-| File | Covers |
-|---|---|
-| [`model-management.feature`](model-management.feature) | Creating, opening, and saving models |
-| [`element-creation.feature`](element-creation.feature) | Layer-specific element creation, update, delete |
-| [`relationship-management.feature`](relationship-management.feature) | Creating relationships with ArchiMate 3.2 validation |
-| [`view-construction.feature`](view-construction.feature) | Diagram views, adding elements, auto-drawn connections |
-| [`navigation-and-search.feature`](navigation-and-search.feature) | Listing, finding, and inspecting elements and relationships |
-| [`impact-analysis.feature`](impact-analysis.feature) | Dependency and impact traversal |
-| [`exchange-format.feature`](exchange-format.feature) | ArchiMate Open Exchange Format import/export |
-| [`export-rendering.feature`](export-rendering.feature) | Mermaid, SVG/PNG, Markdown, and HTML deck export |
-| [`audit-logging.feature`](audit-logging.feature) | Audit log configuration and reading |
+| File | Covers | Wired |
+|---|---|---|
+| [`view-construction.feature`](view-construction.feature) | Diagram views, adding elements, auto-drawn connections | ✅ |
+| [`model-management.feature`](model-management.feature) | Creating, opening, and saving models | — |
+| [`element-creation.feature`](element-creation.feature) | Layer-specific element creation, update, delete | — |
+| [`relationship-management.feature`](relationship-management.feature) | Creating relationships with ArchiMate 3.2 validation | — |
+| [`navigation-and-search.feature`](navigation-and-search.feature) | Listing, finding, and inspecting elements and relationships | — |
+| [`impact-analysis.feature`](impact-analysis.feature) | Dependency and impact traversal | — |
+| [`exchange-format.feature`](exchange-format.feature) | ArchiMate Open Exchange Format import/export | — |
+| [`export-rendering.feature`](export-rendering.feature) | Mermaid, SVG/PNG, Markdown, and HTML deck export | — |
+| [`audit-logging.feature`](audit-logging.feature) | Audit log configuration and reading | — |
+
+Unwired files document the intended behavior but do not yet enforce it through tests. Wiring them is incremental work — see the runner pattern in `view-construction.feature.test.ts` for the template.
 
 Add a new file when a new feature area appears. Keep tool-level scenarios within their area; do not create per-tool files.
 

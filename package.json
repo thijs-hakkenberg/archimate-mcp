@@ -35,6 +35,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@amiceli/vitest-cucumber": "^4.7.0",
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.0",
     "@vitest/coverage-v8": "^2.0.0",
