@@ -80,6 +80,34 @@ describe('exchange-writer', () => {
       expect(xml).toMatch(/target="[^"]+"/);
     });
 
+    it('should include xsi:type on view elements', () => {
+      const model = createTestModelWithView();
+      const xml = writeExchangeFormat(model);
+
+      expect(xml).toContain('xsi:type="archimate:ArchimateDiagramModel"');
+    });
+
+    it('should include xsi:type on diagram node elements', () => {
+      const model = createTestModelWithView();
+      const xml = writeExchangeFormat(model);
+
+      expect(xml).toContain('xsi:type="archimate:ViewNode"');
+    });
+
+    it('should include xsi:type on connection elements', () => {
+      const model = createTestModelWithView();
+      const xml = writeExchangeFormat(model);
+
+      expect(xml).toContain('xsi:type="archimate:ViewConnection"');
+    });
+
+    it('should include xmlns:archimate namespace declaration', () => {
+      const model = createTestModel();
+      const xml = writeExchangeFormat(model);
+
+      expect(xml).toContain('xmlns:archimate="http://www.opengroup.org/xsd/archimate/3.0/"');
+    });
+
     it('should include views in views/diagrams container', () => {
       const model = createTestModelWithView();
       const xml = writeExchangeFormat(model);
