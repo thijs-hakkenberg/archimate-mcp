@@ -7,10 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+## [0.3.0] - 2026-05-05
+
+### Added
 - `archimate_add_to_view` now auto-draws diagram connections for any relationship between the new element and an element already on the canvas, mirroring Archi's native drag-in behavior. Orientation matches the relationship direction and existing connections are not duplicated. The response includes an `autoConnectedRelationships` array listing every connection drawn.
-- Added an `auto_connect` boolean parameter to `archimate_add_to_view` (default `true`) to opt out of auto-drawing.
+- New `auto_connect` boolean parameter on `archimate_add_to_view` (default `true`) to opt out of auto-drawing.
+
+### Changed
 - Updated the description of `archimate_add_connection_to_view` to clarify that it is normally unnecessary and should only be used for manual overrides.
+
+### Fixed
+- Open Exchange Format export now emits the required `xsi:type` attributes on `view`, `node`, and `connection` elements, producing schema-valid XML.
 
 ## [0.2.0] - 2026-02-04
 
@@ -109,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Full relationship validation against specification
   - Helpful error messages with suggestions
 
-[Unreleased]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.1.1...v0.1.2
