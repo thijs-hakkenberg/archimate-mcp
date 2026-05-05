@@ -21,16 +21,16 @@ One `.feature` per cohesive feature area, not per tool. The current areas:
 | File | Covers | Wired |
 |---|---|---|
 | [`view-construction.feature`](view-construction.feature) | Diagram views, adding elements, auto-drawn connections | ✅ |
-| [`model-management.feature`](model-management.feature) | Creating, opening, and saving models | — |
-| [`element-creation.feature`](element-creation.feature) | Layer-specific element creation, update, delete | — |
-| [`relationship-management.feature`](relationship-management.feature) | Creating relationships with ArchiMate 3.2 validation | — |
-| [`navigation-and-search.feature`](navigation-and-search.feature) | Listing, finding, and inspecting elements and relationships | — |
-| [`impact-analysis.feature`](impact-analysis.feature) | Dependency and impact traversal | — |
-| [`exchange-format.feature`](exchange-format.feature) | ArchiMate Open Exchange Format import/export | — |
-| [`export-rendering.feature`](export-rendering.feature) | Mermaid, SVG/PNG, Markdown, and HTML deck export | — |
-| [`audit-logging.feature`](audit-logging.feature) | Audit log configuration and reading | — |
+| [`model-management.feature`](model-management.feature) | Creating, opening, and saving models | ✅ |
+| [`element-creation.feature`](element-creation.feature) | Layer-specific element creation, update, delete | ✅ |
+| [`relationship-management.feature`](relationship-management.feature) | Creating relationships with ArchiMate 3.2 validation | ✅ |
+| [`navigation-and-search.feature`](navigation-and-search.feature) | Listing, finding, and inspecting elements and relationships | ✅ |
+| [`impact-analysis.feature`](impact-analysis.feature) | Dependency and impact traversal | ✅ |
+| [`exchange-format.feature`](exchange-format.feature) | ArchiMate Open Exchange Format import/export | ✅ |
+| [`export-rendering.feature`](export-rendering.feature) | Mermaid, SVG/PNG, Markdown, and HTML deck export | ✅ |
+| [`audit-logging.feature`](audit-logging.feature) | Audit log configuration and reading | ✅ |
 
-Unwired files document the intended behavior but do not yet enforce it through tests. Wiring them is incremental work — see the runner pattern in `view-construction.feature.test.ts` for the template.
+Every feature file has a sibling `<area>.feature.test.ts` that binds its scenarios. Adding a new scenario to any `.feature` requires extending that sibling — the runner fails the suite otherwise.
 
 Add a new file when a new feature area appears. Keep tool-level scenarios within their area; do not create per-tool files.
 

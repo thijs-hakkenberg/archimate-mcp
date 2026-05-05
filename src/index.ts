@@ -28,6 +28,7 @@ import {
 } from './model/parser.js';
 
 import { autoConnectDiagramObject } from './model/view-helpers.js';
+import { analyzeImpact } from './model/impact.js';
 
 import {
   writeModel,
@@ -1388,63 +1389,17 @@ async function handleToolCall(name: string, args: Record<string, unknown>): Prom
       }
 
       const elementId = args.element_id as string;
-      const direction = (args.direction as 'incoming' | 'outgoing' | 'both') || 'both';
-      const maxDepth = (args.depth as number) || 2;
+      const direction = (args.direction as 'incoming' | 'outgoing' | 'both') || undefined;
+      const maxDepth = (args.depth as number) || undefined;
 
-      const rootElement = getElementById(currentModel, elementId);
-      if (!rootElement) {
+      const result = analyzeImpact(currentModel, elementId, direction, maxDepth);
+      if (!result) {
         return [{ type: 'text', text: `Error: Element not found: ${elementId}` }];
       }
 
-      const visited = new Set<string>();
-      const impact: Array<{
-        depth: number;
-        direction: string;
-        relationship: string;
-        elementId: string;
-        elementName: string;
-        elementType: string;
-      }> = [];
-
-      function analyze(id: string, depth: number): void {
-        if (depth > maxDepth || visited.has(id)) return;
-        visited.add(id);
-
-        const rels = getRelationshipsForElement(currentModel!, id, direction);
-        for (const rel of rels) {
-          const isSource = rel.sourceId === id;
-          const otherId = isSource ? rel.targetId : rel.sourceId;
-
-          if (!visited.has(otherId)) {
-            const other = getElementById(currentModel!, otherId);
-            impact.push({
-              depth,
-              direction: isSource ? 'outgoing' : 'incoming',
-              relationship: rel.type,
-              elementId: otherId,
-              elementName: other?.name || 'Unknown',
-              elementType: other?.type || 'Unknown',
-            });
-            analyze(otherId, depth + 1);
-          }
-        }
-      }
-
-      analyze(elementId, 1);
-
       return [{
         type: 'text',
-        text: JSON.stringify({
-          rootElement: {
-            id: rootElement.id,
-            name: rootElement.name,
-            type: rootElement.type,
-          },
-          direction,
-          maxDepth,
-          impactedElements: impact,
-          totalImpacted: impact.length,
-        }, null, 2),
+        text: JSON.stringify(result, null, 2),
       }];
     }
 

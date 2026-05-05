@@ -3,7 +3,7 @@
  * Parses ArchiMate 3.x exchange format XML files
  */
 
-import { XMLParser } from 'fast-xml-parser';
+import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import * as fs from 'fs/promises';
 import type {
   ArchiMateModel,
@@ -210,6 +210,13 @@ function parseDiagram(viewData: Record<string, unknown>): ArchiMateDiagram {
  * Parse ArchiMate Open Exchange Format XML string into model
  */
 export function parseExchangeFormat(xmlContent: string): ArchiMateModel {
+  const validation = XMLValidator.validate(xmlContent);
+  if (validation !== true) {
+    throw new Error(
+      `Invalid Open Exchange XML: ${validation.err.msg} (line ${validation.err.line})`,
+    );
+  }
+
   const parser = new XMLParser(parserOptions);
   const parsed = parser.parse(xmlContent);
 
