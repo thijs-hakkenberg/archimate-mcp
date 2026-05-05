@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-05
+
+### Added
+- Executable behavior specifications under `features/`. Every observable server behavior is documented as a Gherkin `.feature` file with a sibling `.feature.test.ts` binding via `@amiceli/vitest-cucumber`. Nine area files cover all 33 tools and run as part of `npm test` (289 step-level tests).
+- Architecture decision records 008 (OIDC trusted publishing) and 009 (auto-draw view connections) under `docs/adr/`.
+- New `src/model/impact.ts` module exporting `analyzeImpact`, extracted from the `archimate_impact_analysis` handler so callers and the spec exercise the same code path.
+
+### Changed
+- `archimate_import_exchange` (and `parseExchangeFormat`) now strictly validates Open Exchange XML before parsing. Malformed input previously returned a near-empty model silently; it now throws an error with line/column information. Callers relying on the old permissive behavior must catch and handle the error.
+
+### Internal
+- Switched the npm publish workflow to OIDC trusted publishing; the `NPM_TOKEN` secret has been removed.
+- Opted JavaScript-based GitHub Actions into the Node 24 runtime to clear the deprecation warning ahead of the 2026-09-16 cutover.
+- Refreshed `CLAUDE.md` release procedure to reflect the OIDC flow and the BDD update discipline.
+
 ## [0.3.0] - 2026-05-05
 
 ### Added
@@ -116,7 +131,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Full relationship validation against specification
   - Helpful error messages with suggestions
 
-[Unreleased]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/thijs-hakkenberg/archimate-mcp/compare/v0.1.2...v0.1.3
