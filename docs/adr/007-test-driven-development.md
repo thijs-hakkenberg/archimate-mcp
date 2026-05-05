@@ -30,7 +30,7 @@ Testing framework: **Vitest** was chosen over Jest for:
 ## Consequences
 
 ### Positive
-- High test coverage (122+ tests)
+- High test coverage (133+ tests)
 - Clear specification of expected behavior
 - Confidence in refactoring
 - Documentation through tests
@@ -43,22 +43,26 @@ Testing framework: **Vitest** was chosen over Jest for:
 
 ### Test Structure
 
+Tests are colocated next to the source they cover, with shared fixtures under `src/__tests__/fixtures/`.
+
 ```
 src/
 ├── __tests__/
-│   ├── fixtures/
-│   │   ├── sample-model.ts      # Test model factory
-│   │   └── sample-exchange.xml  # Sample files
-│   ├── exporters/
-│   │   ├── mermaid-exporter.test.ts
-│   │   ├── svg-exporter.test.ts
-│   │   ├── markdown-exporter.test.ts
-│   │   └── html-deck-exporter.test.ts
-│   ├── exchange/
-│   │   ├── exchange-reader.test.ts
-│   │   └── exchange-writer.test.ts
-│   └── audit/
-│       └── logger.test.ts
+│   └── fixtures/
+│       ├── sample-model.ts        # Test model factory
+│       └── sample-exchange.xml    # Sample files
+├── audit/
+│   └── logger.test.ts
+├── exchange/
+│   ├── exchange-reader.test.ts
+│   └── exchange-writer.test.ts
+├── exporters/
+│   ├── html-deck-exporter.test.ts
+│   ├── markdown-exporter.test.ts
+│   ├── mermaid-exporter.test.ts
+│   └── svg-exporter.test.ts
+└── model/
+    └── view-helpers.test.ts
 ```
 
 ### Test Examples

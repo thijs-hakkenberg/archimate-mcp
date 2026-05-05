@@ -13,6 +13,8 @@ This directory contains Architecture Decision Records (ADRs) documenting signifi
 | [005](005-single-file-html-deck.md) | Self-Contained Single-File HTML Deck Export | Accepted |
 | [006](006-layer-specific-element-creation.md) | Layer-Specific Element Creation Tools | Accepted |
 | [007](007-test-driven-development.md) | Test-Driven Development with Vitest | Accepted |
+| [008](008-oidc-trusted-publishing.md) | OIDC Trusted Publishing for npm Releases | Accepted |
+| [009](009-auto-draw-view-connections.md) | Auto-Draw Diagram Connections on `archimate_add_to_view` | Accepted |
 
 ## ADR Format
 
