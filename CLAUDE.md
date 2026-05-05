@@ -96,6 +96,15 @@ Procedure (commit directly to `main` — no PR needed for a release bump):
 
 Verify after success: `npm view archimate-mcp-server version` should return `X.Y.Z`. Existing `npx -y archimate-mcp-server@latest` users auto-pick it up.
 
+## Behavior Documentation
+
+**Principle**: every observable behavior of the MCP server is documented in a Gherkin `.feature` file under `features/`. This is non-negotiable. When you add, change, or remove behavior, update the relevant `.feature` file in the same change — not later.
+
+- Files are grouped by feature area, not by tool. See `features/README.md` for the area map and writing conventions.
+- Feature files are documentation-only specs (no cucumber runner). The executable test of record is still vitest.
+- A behavior change without a matching `.feature` update is incomplete. Reviewers should reject PRs that skip this.
+- Bug fixes that reveal previously-unspecified behavior should add a scenario for the now-correct behavior, not just a regression test.
+
 ## Code Style
 
 - Use TypeScript strict mode
